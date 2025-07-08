@@ -1,0 +1,186 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+#load libraries
+library(tidyverse)
+library(cluster)
+library(fpc)
+library(factoextra)
+library(janitor)
+
+#set working directory
+setwd("C:/Users/danabr/Documents/R Projects")
+
+
+FIREdf<-read.csv("FIRE1.csv")
+View(FIREdf)
+
+#Create a data frame with only binary variables - Gender, 
+#Real.Estate.Purchases, Graduate.Degree, Have.Children - 
+#by removing columns 1, 4, 5, and 7
+bindf<-FIREdf[c(3,4,5,6,7,8,11,13,15,17,19,20,21)]
+View(bindf)
+
+bindf[[12]] <- ifelse(bindf[[12]] == "P", 1, 
+                      ifelse(bindf[[12]] == "F", 0, bindf[[12]]))
+
+
+match_dist<-dist(bindf, method="manhattan")
+
+cl_match_avg<-hclust(match_dist, method="average")
+
+plot(cl_match_avg)
+
+cl_match_avg_4<-cutree(cl_match_avg, k=4)
+
+
+cl_match_avg_4
+
+install.packages("dendextend")  # Only needed once
+library(dendextend)
+
+dend <- as.dendrogram(cl_match_avg)
+
+dend_colored <- color_branches(dend, k = 3)
+
+
+# Open a PNG file
+png("dendrogram.png", width = 1200, height = 800)
+
+# Create the plot
+plot(dend_colored, main = "Hierarchical Clustering of Students (Colored by Cluster)")
+
+# Close the file
+dev.off()
+
+plot(dend_colored, horiz = TRUE, main = "Hierarchical Clustering (Horizontal View)")
+
+plot(dend_colored, main = "Hierarchical Clustering", labels = FALSE)
+
+
+
+
+plot(cl_match_avg, labels = FALSE, hang = -1, main = "Cluster Dendrogram")
+rect.hclust(cl_match_avg, k = 3, border = "red")
+
+
+hcl4df<-cbind(FIREdf, clusterID=cl_match_avg_4)
+
+write.csv(hcl4df, "FIRE_hier4_clusters.csv")
+
+hcl4df %>%
+  group_by(clusterID) %>%
+  summarize(n())
+
+bindf$HS.50..or.less.go.to.College<-factor(FIREdf$HS.50..or.less.go.to.College,levels=c(0,1),labels=c("no","yes"))
+bindf$First.Gen<-factor(FIREdf$First.Gen,levels=c(0,1),labels=c("no","yes"))
+bindf$HS.Free.or.Reduced.Price.Lunch<-factor(FIREdf$HS.Free.or.Reduced.Price.Lunch,levels=c(0,1),labels=c("no","yes"))
+bindf$MCAT.500<-factor(FIREdf$MCAT.500,levels=c(0,1),labels=c("no","yes"))
+bindf$UG.Sci.Major<-factor(FIREdf$UG.Sci.Major,levels=c(0,1),labels=c("no","yes"))
+bindf$UG.SCI.GPA...3.4<-factor(FIREdf$UG.SCI.GPA...3.4,levels=c(0,1),labels=c("no","yes"))
+bindf$Non.Traditional.25.<-factor(FIREdf$Non.Traditional.25.,levels=c(0,1),labels=c("no","yes"))
+bindf$Out.of.UG.2.Years<-factor(FIREdf$Out.of.UG.2.Years,levels=c(0,1),labels=c("no","yes"))
+bindf$FIREParticipant<-factor(FIREdf$FIREParticipant,levels=c(0,1),labels=c("no","yes"))
+bindf$Received.GED<-factor(FIREdf$Received.GED,levels=c(0,1),labels=c("no","yes"))
+bindf$HPSA.Area<-factor(FIREdf$HPSA.Area,levels=c(0,1),labels=c("no","yes"))
+bindf$From.a.family.that.Received.Public.Assistance<-factor(FIREdf$From.a.family.that.Received.Public.Assistance,levels=c(0,1),labels=c("no","yes"))
+bindf$COMLEX<-factor(bindf$COMLEX,levels=c(0,1),labels=c("no","yes"))
+bindf$COMLEX <- FIREdf$COMLEX
+
+bindf$COMLEX <- ifelse(FIREdf$COMLEX == "P", 1,
+                       ifelse(FIREdf$COMLEX == "F", 0, NA))
+
+hcl4df<-cbind(bindf, clusterID=cl_match_avg_4)
+
+head(hcl4df)
+write.csv(hcl4df, "FIRE_hier4_clusters.csv")
+
+
+tabyl(bindf$HS.50..or.less.go.to.College)
+tabyl(bindf$First.Gen)
+tabyl(bindf$Received.GED)
+tabyl(bindf$HPSA.Area)
+tabyl(bindf$MCAT.500)
+tabyl(bindf$UG.Sci.Major)
+tabyl(bindf$UG.SCI.GPA...3.4)
+tabyl(bindf$Non.Traditional.25.)
+tabyl(bindf$Out.of.UG.2.Years)
+tabyl(bindf$FIREParticipant)
+tabyl(bindf$COMLEX)
+
+
+tabyl(hcl4df,HS.50..or.less.go.to.College,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+
+tabyl(hcl4df,First.Gen,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+
+tabyl(hcl4df,Received.GED,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+
+tabyl(hcl4df,HPSA.Area,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+
+tabyl(hcl4df,MCAT.500,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+  
+
+tabyl(hcl4df,MCAT.500,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+ 
+tabyl(hcl4df,UG.Sci.Major,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+
+tabyl(hcl4df,UG.SCI.GPA...3.4,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+
+tabyl(hcl4df,Non.Traditional.25.,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+
+tabyl(hcl4df,Out.of.UG.2.Years,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+
+tabyl(hcl4df,FIREParticipant,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+
+tabyl(hcl4df,COMLEX,clusterID) %>%
+  adorn_percentages("col") %>%
+  adorn_pct_formatting(digits=2) %>%
+  adorn_ns()
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
