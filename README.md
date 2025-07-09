@@ -26,7 +26,7 @@ This project applies **hierarchical clustering** in R to analyze student profile
 - **Distance Metric**: Manhattan
 - **Linkage Method**: Average linkage
 - **Visualization**: Colored dendrograms
-
+```
 ---
 
 ## 📁 Dataset Features (binary variables used)
