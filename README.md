@@ -26,7 +26,7 @@ This project applies **hierarchical clustering** in R to analyze student profile
 - **Distance Metric**: Manhattan
 - **Linkage Method**: Average linkage
 - **Visualization**: Colored dendrograms
-```
+
 ---
 
 ## 📁 Dataset Features (binary variables used)
@@ -90,7 +90,7 @@ cl_match_avg <- hclust(match_dist, method="average")
 dend <- as.dendrogram(cl_match_avg)
 dend_colored <- color_branches(dend, k = 3)
 plot(dend_colored, main = "FIRE Student Clusters")
-
+```
 
 ## 💡 Key Insights
 
