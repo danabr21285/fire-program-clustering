@@ -1,6 +1,6 @@
 # 🔍 FIRE Program Hierarchical Clustering Analysis
 
-This project applies **hierarchical clustering** in R to analyze student profiles in the FIRE (Focused Instructional Review & Enhancement) program. The goal is to identify patterns and subgroupings based on key indicators such as first-generation status, GPA, MCAT, and eventual COMLEX outcomes.
+This project applies **hierarchical clustering** in R to analyze student profiles in the FIRE (Prematriculation) program. The goal is to identify patterns and subgroupings based on key indicators such as first-generation status, GPA, MCAT, and eventual COMLEX outcomes.
 
 ---
 
